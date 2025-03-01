@@ -12,13 +12,15 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @PostMapping("/add")
-    public EmployeeDTO createEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        return employeeService.createEmployee(employeeDTO);
-    }
-
-    @GetMapping("/all")
+    // GET all employees (Delegates to Service Layer)
+    @GetMapping
     public List<EmployeeDTO> getAllEmployees() {
         return employeeService.getAllEmployees();
+    }
+
+    // POST - Create Employee (Delegates to Service Layer)
+    @PostMapping
+    public EmployeeDTO createEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        return employeeService.createEmployee(employeeDTO);
     }
 }
