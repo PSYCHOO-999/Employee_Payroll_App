@@ -12,15 +12,28 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    // GET all employees (Delegates to Service Layer)
+    // GET all employees
     @GetMapping
     public List<EmployeeDTO> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
-    // POST - Create Employee (Delegates to Service Layer)
+    // POST - Create Employee
     @PostMapping
     public EmployeeDTO createEmployee(@RequestBody EmployeeDTO employeeDTO) {
         return employeeService.createEmployee(employeeDTO);
+    }
+
+    // PUT - Update Employee
+    @PutMapping("/{id}")
+    public EmployeeDTO updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
+        return employeeService.updateEmployee(id, employeeDTO);
+    }
+
+    // DELETE - Remove Employee
+    @DeleteMapping("/{id}")
+    public String deleteEmployee(@PathVariable Long id) {
+        employeeService.deleteEmployee(id);
+        return "Employee with ID " + id + " deleted successfully!";
     }
 }

@@ -1,38 +1,46 @@
 package com.bridgelabz.EmployeePayRollapp.service;
 
 import com.bridgelabz.EmployeePayRollapp.dto.EmployeeDTO;
-import com.bridgelabz.EmployeePayRollapp.entity.Employee;
-import com.bridgelabz.EmployeePayRollapp.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final List<EmployeeDTO> employeeList = new ArrayList<>();
+    private final AtomicLong counter = new AtomicLong(1); // Auto-increment ID
 
-    // Get all employees
     @Override
     public List<EmployeeDTO> getAllEmployees() {
-        return employeeRepository.findAll()
-                .stream()
-                .map(emp -> new EmployeeDTO(emp.getName(), emp.getSalary()))
-                .collect(Collectors.toList());
+        return employeeList;
     }
 
-    // Create a new employee
     @Override
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO) {
-        Employee employee = new Employee();
-        employee.setName(employeeDTO.getName());
-        employee.setSalary(employeeDTO.getSalary());
+        employeeDTO.setId(counter.getAndIncrement()); // Assign an ID
+        employeeList.add(employeeDTO);
+        return employeeDTO;
+    }
 
-        Employee savedEmployee = employeeRepository.save(employee);
-        return new EmployeeDTO(savedEmployee.getName(), savedEmployee.getSalary());
+    @Override
+    public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
+        for (EmployeeDTO emp : employeeList) {
+            if (emp.getId().equals(id)) {
+                emp.setName(employeeDTO.getName());
+                emp.setSalary(employeeDTO.getSalary());
+                return emp;
+            }
+        }
+        return null; // In real cases, throw an exception
+    }
+
+    @Override
+    public void deleteEmployee(Long id) {
+        employeeList.removeIf(emp -> emp.getId().equals(id));
     }
 }
+
 
