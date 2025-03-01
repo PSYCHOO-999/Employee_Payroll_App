@@ -1,20 +1,24 @@
 package com.bridgelabz.EmployeePayRollapp.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "employees")
 @Getter
 @Setter
-@Table(name = "employees")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Employee {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
-    private String department;
+
+    @Column(nullable = false)
     private double salary;
+
 }
