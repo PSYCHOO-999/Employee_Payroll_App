@@ -1,39 +1,55 @@
 package com.bridgelabz.EmployeePayRollapp.components;
 import org.springframework.web.bind.annotation.*;
-import com.bridgelabz.EmployeePayRollapp.dto.EmployeeDTO;
 import com.bridgelabz.EmployeePayRollapp.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import com.bridgelabz.EmployeePayRollapp.dto.EmployeeDTO;
+import com.bridgelabz.EmployeePayRollapp.entity.Employee;
+import org.springframework.beans.factory.annotation.Autowired;
 
+
+@Slf4j
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
 
-    // GET all employees
+    @Autowired
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
+
     @GetMapping
-    public List<EmployeeDTO> getAllEmployees() {
+    public List<Employee> getEmployees() {
+        log.info("Fetching all employees via GET /employees");
         return employeeService.getAllEmployees();
     }
 
-    // POST - Create Employee
-    @PostMapping
-    public EmployeeDTO createEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        return employeeService.createEmployee(employeeDTO);
+    @GetMapping("/{id}")
+    public Employee getEmployeeById(@PathVariable Long id) {
+        log.info("Fetching Employee with ID: {}", id);
+        return employeeService.getEmployeeById(id);
     }
 
-    // PUT - Update Employee
+    @PostMapping
+    public Employee addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("POST /employees - Adding Employee: {}", employeeDTO.getName());
+        return employeeService.addEmployee(employeeDTO);
+    }
+
     @PutMapping("/{id}")
-    public EmployeeDTO updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
+    public Employee updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
+        log.info("PUT /employees/{} - Updating Employee", id);
         return employeeService.updateEmployee(id, employeeDTO);
     }
 
-    // DELETE - Remove Employee
     @DeleteMapping("/{id}")
     public String deleteEmployee(@PathVariable Long id) {
+        log.info("DELETE /employees/{} - Deleting Employee", id);
         employeeService.deleteEmployee(id);
-        return "Employee with ID " + id + " deleted successfully!";
+        return "Employee deleted successfully!";
     }
 }
+
+

@@ -4,43 +4,58 @@ import com.bridgelabz.EmployeePayRollapp.dto.EmployeeDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicLong;
+import com.bridgelabz.EmployeePayRollapp.entity.Employee;
+import com.bridgelabz.EmployeePayRollapp.repository.EmployeeRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Service
+@Slf4j  // Enables Logging
+@Service  // Marks this as a Service Layer
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final List<EmployeeDTO> employeeList = new ArrayList<>();
-    private final AtomicLong counter = new AtomicLong(1); // Auto-increment ID
+    private final EmployeeRepository employeeRepository;
 
-    @Override
-    public List<EmployeeDTO> getAllEmployees() {
-        return employeeList;
+    @Autowired  // Injects EmployeeRepository
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
-    public EmployeeDTO createEmployee(EmployeeDTO employeeDTO) {
-        employeeDTO.setId(counter.getAndIncrement()); // Assign an ID
-        employeeList.add(employeeDTO);
-        return employeeDTO;
+    public List<Employee> getAllEmployees() {
+        log.info("Fetching all employees from database");
+        return employeeRepository.findAll();
     }
 
     @Override
-    public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
-        for (EmployeeDTO emp : employeeList) {
-            if (emp.getId().equals(id)) {
-                emp.setName(employeeDTO.getName());
-                emp.setSalary(employeeDTO.getSalary());
-                return emp;
-            }
-        }
-        return null; // In real cases, throw an exception
+    public Employee getEmployeeById(Long id) {
+        log.info("Fetching employee with ID: {}", id);
+        return employeeRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Employee not found with ID: " + id));
+    }
+
+    @Override
+    public Employee addEmployee(EmployeeDTO employeeDTO) {
+        log.info("Adding new Employee: {}", employeeDTO.getName());
+        Employee employee = new Employee(employeeDTO.getName(), employeeDTO.getSalary());
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Employee updateEmployee(Long id, EmployeeDTO employeeDTO) {
+        log.info("Updating Employee with ID: {}", id);
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + id));
+        existingEmployee.setName(employeeDTO.getName());
+        existingEmployee.setSalary(employeeDTO.getSalary());
+        return employeeRepository.save(existingEmployee);
     }
 
     @Override
     public void deleteEmployee(Long id) {
-        employeeList.removeIf(emp -> emp.getId().equals(id));
+        log.warn("Deleting Employee with ID: {}", id);
+        employeeRepository.deleteById(id);
     }
 }
+
 
 
