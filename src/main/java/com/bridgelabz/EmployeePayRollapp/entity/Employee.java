@@ -1,25 +1,25 @@
 package com.bridgelabz.EmployeePayRollapp.entity;
 
+import com.bridgelabz.EmployeePayRollapp.dto.EmployeeDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
-
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "employees")
 public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private double salary;
 
-    public Employee(String name, double salary) {
-        this.name = name;
-        this.salary = salary;
+    // ✅ Add this constructor to accept EmployeeDTO
+    public Employee(EmployeeDTO employeeDTO) {
+        this.name = employeeDTO.getName();
+        this.salary = employeeDTO.getSalary();
     }
 }
-

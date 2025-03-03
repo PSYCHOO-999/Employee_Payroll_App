@@ -2,15 +2,12 @@ package com.bridgelabz.EmployeePayRollapp.service;
 
 import com.bridgelabz.EmployeePayRollapp.dto.EmployeeDTO;
 import com.bridgelabz.EmployeePayRollapp.entity.Employee;
+import com.bridgelabz.EmployeePayRollapp.exception.EmployeeNotFoundException;
 import com.bridgelabz.EmployeePayRollapp.repository.EmployeeRepository;
-import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
-@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -25,30 +22,26 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with ID " + id + " not found"));
     }
 
     @Override
-    public Employee addEmployee(@Valid EmployeeDTO employeeDTO) {
-        log.info("Adding new employee: {}", employeeDTO.getName());
-        Employee employee = new Employee();
+    public Employee addEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee(employeeDTO);
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public Employee updateEmployee(Long id, EmployeeDTO employeeDTO) {
+        Employee employee = getEmployeeById(id);  // This will throw exception if not found
         employee.setName(employeeDTO.getName());
         employee.setSalary(employeeDTO.getSalary());
         return employeeRepository.save(employee);
     }
 
     @Override
-    public Employee updateEmployee(Long id, @Valid EmployeeDTO employeeDTO) {
-        Employee existingEmployee = getEmployeeById(id);
-        log.info("Updating employee with ID: {}", id);
-        existingEmployee.setName(employeeDTO.getName());
-        existingEmployee.setSalary(employeeDTO.getSalary());
-        return employeeRepository.save(existingEmployee);
-    }
-
-    @Override
     public void deleteEmployee(Long id) {
-        employeeRepository.deleteById(id);
-        log.info("Deleted employee with ID: {}", id);
+        Employee employee = getEmployeeById(id);  // This will throw exception if not found
+        employeeRepository.delete(employee);
     }
 }
